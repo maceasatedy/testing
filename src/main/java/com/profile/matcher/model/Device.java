@@ -1,13 +1,12 @@
 package com.profile.matcher.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @Entity(name = "device")
@@ -25,7 +24,8 @@ public class Device {
     @Column(name = "firmware")
     private String firmware;
 
-    @ManyToOne
-    @JoinColumn(name = "playerProfileId")
-    private PlayerProfile playerProfile;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "playerId")
+    @JsonIgnore
+    private Player player;
 }

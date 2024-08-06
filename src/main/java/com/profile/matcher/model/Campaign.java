@@ -1,16 +1,13 @@
 package com.profile.matcher.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 public class Campaign {
@@ -28,7 +25,8 @@ public class Campaign {
     @Column(name = "priority")
     private double priority;
 
-    @Embedded
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "matcher_id")
     private Matcher matcher;
 
     @Column(name = "start_date")

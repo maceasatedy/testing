@@ -3,35 +3,39 @@ package com.profile.matcher.service;
 import com.profile.matcher.model.Campaign;
 import com.profile.matcher.model.Inventory;
 import com.profile.matcher.model.Matcher;
-import com.profile.matcher.model.PlayerProfile;
-import com.profile.matcher.repository.PlayerProfileRepository;
+import com.profile.matcher.model.Player;
+import com.profile.matcher.repository.CampaignRepository;
+import com.profile.matcher.repository.PlayerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
-public class ProfileService {
+public class PlayerService {
 
     @Autowired
-    private final PlayerProfileRepository playerProfileRepository;
+    private final PlayerRepository playerRepository;
 
     @Autowired
     private final CampaignService campaignService;
 
 
-    public ProfileService(PlayerProfileRepository playerProfileRepository, CampaignService campaignService) {
-        this.playerProfileRepository = playerProfileRepository;
+    public PlayerService(PlayerRepository playerRepository, CampaignService campaignService) {
+        this.playerRepository = playerRepository;
         this.campaignService = campaignService;
     }
 
-    public List<PlayerProfile> getAllProfiles(){
-        List<PlayerProfile> profiles = (List<PlayerProfile>) playerProfileRepository.findAll();
+    public List<Player> getAllProfiles(){
+        for(int i=0; i<3; i++){
+            System.out.println(i);
+        }
+        List<Player> profiles = (List<Player>) playerRepository.findAll();
         if (profiles.isEmpty()){
             log.info("List of profiles is empty.");
         }
@@ -39,21 +43,20 @@ public class ProfileService {
 
     }
 
-    public PlayerProfile getPlayerProfileById(Long player_Id) {
-        System.out.println("TEST");
-        log.info("TEST log");
-        PlayerProfile profile = playerProfileRepository.findById(player_Id).orElseThrow(()-> new ResourceNotFoundException("Player not found."));
-        if (profile == null) {
-            log.error("Error while fetching player profile from database.");
+    public Player getPlayerById(Long playerId) {
+        Optional<Player> profile = playerRepository.findById(playerId);
+        if (profile.isPresent()){
+            log.info("Found player: {}", profile);
+            return profile.get();
         }
-        log.info("Found player: {}", profile);
-        return profile;
+        log.info("Player not found for id: "+playerId);
+        throw new ResourceNotFoundException("Player not found.");
     }
 
-    public PlayerProfile updatePlayerProfile(Long playerId){
+    public Player updatePlayerProfile(Long playerId){
         log.info("Starting updating player profile for playerId:{}", playerId);
 
-        PlayerProfile profile = getPlayerProfileById(playerId);
+        Player profile = getPlayerById(playerId);
 
 
         List<Campaign> campaigns = campaignService.getCurrentCampaigns();
@@ -62,10 +65,10 @@ public class ProfileService {
                 .filter(campaign -> matchesCampaign(profile, campaign))
                 .forEach(profile.getActiveCampaigns()::add);
 
-        return playerProfileRepository.save(profile);
+        return playerRepository.save(profile);
     }
 
-    private boolean matchesCampaign(PlayerProfile profile, Campaign campaign){
+    private boolean matchesCampaign(Player profile, Campaign campaign){
 
         Matcher matchers = campaign.getMatcher();
         Inventory inventory = profile.getInventory();

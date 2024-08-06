@@ -1,9 +1,9 @@
 package com.profile.matcher.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,10 +14,10 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlayerProfile {
+public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long playerProfileId;
+    private Long playerId;
 
     @Column(name = "credential")
     private String credential;
@@ -46,7 +46,9 @@ public class PlayerProfile {
     @ElementCollection
     private List<Campaign> activeCampaigns;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "playerProfile")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player")
+    @JsonIgnore
+    @ToString.Exclude
     private List<Device> devices;
 
     @Column(name = "level")
@@ -71,10 +73,10 @@ public class PlayerProfile {
     private String gender;
 
     @Embedded
-    private Inventory inventory;
+    private Inventory inventory = new Inventory();
 
     @Embedded
-    private Clan clan;
+    private Clan clan = new Clan();
 
     @Column(name = "custom_field")
     private String customField;

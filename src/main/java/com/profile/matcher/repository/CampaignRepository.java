@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface CampaignRepository extends JpaRepository<Campaign, Long> {
 
-    @Query("SELECT c FROM Campaign c WHERE c.enabled = true AND c.startDate <= :currentDate AND c.endDate >= :currentDate")
+    @Query("SELECT c FROM Campaign c WHERE :currentDate BETWEEN c.startDate AND c.endDate AND c.enabled = true")
     List<Campaign> findActiveCampaigns(@Param("currentDate") LocalDateTime currentDate);
 
 }
